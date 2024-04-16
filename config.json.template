@@ -1,0 +1,25 @@
+{
+    "app_name": "bebas-ongkir-engine",
+    "domain_name": "bo-campaign",
+    "table_name": "bo_campaign",
+    "attributes": [
+        {
+            "column_name": "id", // MANDATORY AND MUST BE FIRST
+            "type": "bigint"
+        },
+        {
+            "column_name": "bo_code_ids",
+            "type": "[]int"
+        },
+        {
+            "column_name": "created_at",
+            "type": "timestamp"
+        }
+    ],
+    "options": {
+        "is_use_redis_and_memcache": true,
+        "is_use_singleflight": true
+    },
+    "redis_ttl": 0,
+    "memcache_ttl" : 0
+}
