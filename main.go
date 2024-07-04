@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -26,7 +25,7 @@ func main() {
 	os.Mkdir(utils.ResultFolderPath, 0770)
 
 	// make domain name to lower case
-	requestData.DomainName = strings.ToLower(requestData.DomainName)
+	requestData.DomainName = utils.StringToLower(requestData.DomainName)
 
 	// remove folder domain if exist
 	if _, err := os.Stat(utils.GenerateResultPath(requestData.DomainName)); !os.IsNotExist(err) {

@@ -4,10 +4,6 @@ import (
 	"domain-crud-generator/utils"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
-
-	"github.com/gobeam/stringy"
 )
 
 func createFile(path string) (f *os.File) {
@@ -31,7 +27,7 @@ func generateStructValue(attrs []Attribute) string {
 		jsonTag := "json:" + `"` + attr.ColumnName + `"`
 		dbTag := "db:" + `"` + attr.ColumnName + `"`
 		// replace id to uppercase (handle attribute which have suffix id)
-		attributeName := strings.ReplaceAll(stringy.New(attr.ColumnName).CamelCase(), "Id", "ID")
+		attributeName := utils.StringReplaceAll(utils.StringToCamelCase(attr.ColumnName), "Id", "ID")
 
 		attributeDetail := fmt.Sprintf("%s %s `%s %s`", attributeName, convertType(attr.Type), jsonTag, dbTag)
 		result += attributeDetail + "\n"
@@ -41,11 +37,11 @@ func generateStructValue(attrs []Attribute) string {
 
 func generateAppNameAcronym(appName string) string {
 	// remove "engine"
-	appName = strings.Replace(appName, "-engine", "", 1)
+	appName = utils.StringReplace(appName, "-engine", "", 1)
 
-	splits := strings.Split(appName, "-")
-	appName = strings.Join(splits, " ")
-	return stringy.New(appName).Acronym().ToLower()
+	splits := utils.StringSplit(appName, "-")
+	appName = utils.StringJoin(splits, " ")
+	return utils.StringToAcronym(appName)
 }
 
 func generateQueryFromAttributes(attrs []Attribute, tableName string) string {
@@ -71,7 +67,7 @@ func generateQueryFromAttributes(attrs []Attribute, tableName string) string {
 func generateParamNumberList(start, lenParam int) string {
 	result := ""
 	for i := start; i < start+lenParam; i++ {
-		result = result + "$" + strconv.Itoa(i) + ","
+		result = result + "$" + utils.IntToString(i) + ","
 	}
 
 	if result == "" {
@@ -88,11 +84,11 @@ func generateSetAttribute(idx int, columnName string) string {
 }
 
 func replaceDashWithUnderscore(s string) string {
-	return strings.ReplaceAll(s, "-", "_")
+	return utils.StringReplaceAll(s, "-", "_")
 }
 
 func writePackageName(f *os.File, domainName string) {
-	packageStr := strings.ReplaceAll(packageCode, domainNameLowerCaseReplacer, stringy.New(domainName).RemoveSpecialCharacter())
+	packageStr := utils.StringReplaceAll(packageCode, domainNameLowerCaseReplacer, utils.StringRemoveSpecialCharacter(domainName))
 	f.Write(convertToByteln(packageStr))
 }
 
@@ -100,7 +96,7 @@ func generateScanGetAttribute(attrs []Attribute) string {
 	result := ""
 	for _, attr := range attrs {
 		// replace id to uppercase
-		attributeName := strings.ReplaceAll(stringy.New(attr.ColumnName).CamelCase(), "Id", "ID")
+		attributeName := utils.StringReplaceAll(utils.StringToCamelCase(attr.ColumnName), "Id", "ID")
 
 		var attributeResult string
 		if mapIsDataArray[convertType(attr.Type)] {
@@ -122,7 +118,7 @@ func generateScanInsertAttribute(attrs []Attribute) string {
 		}
 
 		// replace id to uppercase (handle attribute which have suffix id)
-		attributeName := strings.ReplaceAll(stringy.New(attr.ColumnName).CamelCase(), "Id", "ID")
+		attributeName := utils.StringReplaceAll(utils.StringToCamelCase(attr.ColumnName), "Id", "ID")
 
 		var attributeResult string
 		if mapIsDataArray[convertType(attr.Type)] {
@@ -139,7 +135,7 @@ func generateScanUpdateAttribute(attrs []Attribute) string {
 	result := ""
 	for _, attr := range attrs {
 		// replace id to uppercase
-		attributeName := strings.ReplaceAll(stringy.New(attr.ColumnName).CamelCase(), "Id", "ID")
+		attributeName := utils.StringReplaceAll(utils.StringToCamelCase(attr.ColumnName), "Id", "ID")
 
 		var attributeResult string
 		if mapIsDataArray[convertType(attr.Type)] {
@@ -156,7 +152,7 @@ func generateCopyAttribute(attrs []Attribute) string {
 	result := ""
 	// copy slice first
 	for _, attr := range attrs {
-		attributeName := strings.ReplaceAll(stringy.New(attr.ColumnName).CamelCase(), "Id", "ID")
+		attributeName := utils.StringReplaceAll(utils.StringToCamelCase(attr.ColumnName), "Id", "ID")
 		if mapIsDataArray[convertType(attr.Type)] {
 			result += fmt.Sprintf(`
 			copy%s := make(%s, len([domainName].%s))
@@ -168,7 +164,7 @@ func generateCopyAttribute(attrs []Attribute) string {
 	result += "copyResult[i] = [DomainName]{\n"
 	// copy all attributes
 	for _, attr := range attrs {
-		attributeName := strings.ReplaceAll(stringy.New(attr.ColumnName).CamelCase(), "Id", "ID")
+		attributeName := utils.StringReplaceAll(utils.StringToCamelCase(attr.ColumnName), "Id", "ID")
 		if mapIsDataArray[convertType(attr.Type)] {
 			result += fmt.Sprintf("%s: copy%s,\n", attributeName, attributeName)
 		} else {
